@@ -43,7 +43,11 @@ import org.camunda.bpm.engine.impl.core.instance.CoreExecution;
 import org.camunda.bpm.engine.impl.core.operation.CoreAtomicOperation;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
 import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
-import org.camunda.bpm.engine.impl.core.variable.scope.*;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableCollectionProvider;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceFactory;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableInstanceLifecycleListener;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableListenerInvocationListener;
+import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore;
 import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore.VariablesProvider;
 import org.camunda.bpm.engine.impl.db.DbEntity;
 import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
@@ -51,6 +55,7 @@ import org.camunda.bpm.engine.impl.db.HasDbReferences;
 import org.camunda.bpm.engine.impl.db.HasDbRevision;
 import org.camunda.bpm.engine.impl.event.EventType;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
+import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
@@ -58,7 +63,6 @@ import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.interceptor.AtomicOperationInvocation;
 import org.camunda.bpm.engine.impl.jobexecutor.MessageJobDeclaration;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
-import org.camunda.bpm.engine.impl.persistence.entity.util.FormPropertyStartContext;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.delegate.CompositeActivityBehavior;
@@ -481,27 +485,6 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
         tenantId = tenantIdProvider.provideTenantIdForProcessInstance(ctx);
       }
     }
-  }
-
-  public void startWithFormProperties(VariableMap properties) {
-    setRootProcessInstanceId(getProcessInstanceId());
-    provideTenantId(properties);
-    if (isProcessInstanceExecution()) {
-      ActivityImpl initial = processDefinition.getInitial();
-      ProcessInstanceStartContext processInstanceStartContext = getProcessInstanceStartContext();
-      if (processInstanceStartContext != null) {
-        initial = processInstanceStartContext.getInitial();
-      }
-      FormPropertyStartContext formPropertyStartContext = new FormPropertyStartContext(initial);
-      formPropertyStartContext.setFormProperties(properties);
-      startContext = formPropertyStartContext;
-
-      initialize();
-      initializeTimerDeclarations();
-      fireHistoricProcessStartEvent();
-    }
-
-    performOperation(PvmAtomicOperation.PROCESS_START);
   }
 
   @Override
