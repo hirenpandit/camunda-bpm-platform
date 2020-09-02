@@ -445,7 +445,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
   }
 
   @Override
-  public void start(Map<String, Object> variables) {
+  public void start(Map<String, Object> variables, VariableMap formProperties) {
     if (getSuperExecution() == null) {
       setRootProcessInstanceId(processInstanceId);
     } else {
@@ -455,7 +455,7 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
 
     // determine tenant Id if null
     provideTenantId(variables);
-    super.start(variables);
+    super.start(variables, formProperties);
   }
 
   @Override

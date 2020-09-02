@@ -77,6 +77,8 @@ public class CustomHistoryEventHandlerTest {
 
   @Before
   public void initServices() {
+    recorderHandler.clear();
+    
     runtimeService = engineRule.getRuntimeService();
     taskService = engineRule.getTaskService();
   }
