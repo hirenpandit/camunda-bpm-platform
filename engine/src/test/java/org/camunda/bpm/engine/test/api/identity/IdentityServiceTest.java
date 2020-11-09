@@ -334,18 +334,31 @@ public class IdentityServiceTest {
   public void testCreateMembershipUnexistingGroup() {
     User johndoe = identityService.newUser("johndoe");
     identityService.saveUser(johndoe);
-    thrown.expect(NullValueException.class);
-    thrown.expectMessage("No group found with id 'unexistinggroup'.: group is null");
-    identityService.createMembership(johndoe.getId(), "unexistinggroup");
+    try {
+      identityService.createMembership(johndoe.getId(), "unexistinggroup");
+      fail("NullValueException is expected");
+    } catch(Exception ex) {
+      if(!(ex instanceof NullValueException)) {
+        fail("NullValueException is expected  but other exception was received: " + ex);
+      }
+      assertEquals("No group found with id 'unexistinggroup'.: group is null", ex.getMessage());
+    }
   }
 
   @Test
   public void testCreateMembershipUnexistingUser() {
     Group sales = identityService.newGroup("sales");
     identityService.saveGroup(sales);
-    thrown.expect(NullValueException.class);
-    thrown.expectMessage("No user found with id 'unexistinguser'.: user is null");
-    identityService.createMembership("unexistinguser", sales.getId());
+    try {
+      identityService.createMembership("unexistinguser", sales.getId());
+      fail("NullValueException is expected");
+    } catch(Exception ex) {
+      if(!(ex instanceof NullValueException)) {
+        fail("NullValueException is expected  but other exception was received: " + ex);
+      }
+      assertEquals("No user found with id 'unexistinguser'.: user is null", ex.getMessage());
+    }
+
   }
 
   @Test
